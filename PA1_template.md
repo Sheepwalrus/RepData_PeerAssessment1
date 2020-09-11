@@ -1,0 +1,302 @@
+---
+title: "PA1_template"
+output:
+  html_document:
+    df_print: paged
+    self_contained: no
+    keep_md: yes
+---
+
+
+```r
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```r
+library(markdown)
+```
+
+```
+## Warning: package 'markdown' was built under R version 4.0.2
+```
+
+```r
+library(knitr)
+```
+
+```
+## Warning: package 'knitr' was built under R version 4.0.2
+```
+
+```r
+library(ggplot2)
+```
+
+```
+## Warning: package 'ggplot2' was built under R version 4.0.2
+```
+
+```r
+library(dplyr)
+```
+
+```
+## Warning: package 'dplyr' was built under R version 4.0.2
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+## Loading and preprocessing the data
+Show any code that is needed to
+
+1. Load the data (read.csv())
+2. Process/transform the data (if necessary) into a format suitable for your analysis
+
+
+```r
+data <- read.csv("activity.csv")
+head(data)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["steps"],"name":[1],"type":["int"],"align":["right"]},{"label":["date"],"name":[2],"type":["chr"],"align":["left"]},{"label":["interval"],"name":[3],"type":["int"],"align":["right"]}],"data":[{"1":"NA","2":"2012-10-01","3":"0","_rn_":"1"},{"1":"NA","2":"2012-10-01","3":"5","_rn_":"2"},{"1":"NA","2":"2012-10-01","3":"10","_rn_":"3"},{"1":"NA","2":"2012-10-01","3":"15","_rn_":"4"},{"1":"NA","2":"2012-10-01","3":"20","_rn_":"5"},{"1":"NA","2":"2012-10-01","3":"25","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+1. See above code for loading and reading the data. 
+2. No transforming necessary. 
+
+## What is mean total number of steps taken per day?
+For this part of the assignment, you can ignore the missing values in the dataset.
+
+1. Calculate the total number of steps taken per day
+2. Make a histogram of the total number of steps taken each day
+3. Calculate and report the mean and median of the total number of steps taken per day
+
+
+```r
+# Creates a table that sums up the steps taken each day
+totalStepsEachDay <- aggregate (steps ~ date, data, sum, na.rm=TRUE)
+head(totalStepsEachDay)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["date"],"name":[1],"type":["chr"],"align":["left"]},{"label":["steps"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"2012-10-02","2":"126","_rn_":"1"},{"1":"2012-10-03","2":"11352","_rn_":"2"},{"1":"2012-10-04","2":"12116","_rn_":"3"},{"1":"2012-10-05","2":"13294","_rn_":"4"},{"1":"2012-10-06","2":"15420","_rn_":"5"},{"1":"2012-10-07","2":"11015","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+```r
+# Creates histogram
+# 30 Breaks is a decent number without being too spread out or overly bunched up
+hist(totalStepsEachDay$steps, col="red", breaks=30, labels=TRUE,
+     xlab="Total Number of Steps Within Binned Range", ylab="Frequency of Number of Steps Within Binned Range", ylim=c(0, 15), 
+     main="Distribution of Total Number of Steps Taken Each Day")
+```
+
+![](PA1_template_files/figure-html/mean-total-number-of-steps-taken-per-day-1.png)<!-- -->
+
+```r
+meanTotalStepsPerDay <- mean(totalStepsEachDay$steps, na.rm=TRUE) # 10766.19
+meanTotalStepsPerDay
+```
+
+```
+## [1] 10766.19
+```
+
+```r
+medianTotalStepsPerDay <- median(totalStepsEachDay$steps, na.rm=TRUE) # 10765
+medianTotalStepsPerDay 
+```
+
+```
+## [1] 10765
+```
+
+1. October 2nd: 126
+   October 3rd: 11352
+   October 4th: 12116
+   October 5th: 13294
+   October 6th: 15420
+   October 7th: 11015
+2. See Above Histogram
+3. Mean: 10766.19
+   Median: 10765
+
+
+## What is the average daily activity pattern?
+1. Make a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+
+```r
+stepsPerInterval <- aggregate(steps ~ interval, data, mean, na.rm=TRUE)
+head(stepsPerInterval)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["interval"],"name":[1],"type":["int"],"align":["right"]},{"label":["steps"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"0","2":"1.7169811","_rn_":"1"},{"1":"5","2":"0.3396226","_rn_":"2"},{"1":"10","2":"0.1320755","_rn_":"3"},{"1":"15","2":"0.1509434","_rn_":"4"},{"1":"20","2":"0.0754717","_rn_":"5"},{"1":"25","2":"2.0943396","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+```r
+# Time Series Plot
+plot(stepsPerInterval$interval, stepsPerInterval$steps, pch = 20, xlab = "Time Intervals (5 minutes)", ylab = "Number of steps", type="l", col="green", main = "Average number of steps taken")
+```
+
+![](PA1_template_files/figure-html/average-daily-activity-pattern-1.png)<!-- -->
+
+```r
+maxRow <- which.max(stepsPerInterval$steps)
+maxInterval <- stepsPerInterval[maxRow,1] # 835
+maxInterval
+```
+
+```
+## [1] 835
+```
+
+1. See above time series plot
+2. The 835th time interval. 
+
+## Imputing missing values
+Note that there are a number of days/intervals where there are missing values (coded as \color{red}{\verb|NA|}NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
+
+1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with \color{red}{\verb|NA|}NAs)
+2. Devise a strategy for filling in all of the missing values in the dataset. 
+3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. 
+5. Do these values differ from the estimates from the first part of the assignment? 
+6. What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
+```r
+NumOfMissingValues <- sum(is.na(data$steps)) # 2304
+NumOfMissingValues
+```
+
+```
+## [1] 2304
+```
+
+```r
+# Creates a vector of just the locations of the data where the values are not available
+missingDataVector <- is.na(data$steps)
+
+# Replaces all missing data with the average number of steps across all days. Not the best solution but its simple and works.
+data$steps[missingDataVector] <- mean(data$steps, na.rm=TRUE)
+
+# Creates a new version of the table with the data filled in.
+# Since we modified it in place last time, we're just copying our current set. If we want the missing data values back, we could just reload the original
+newData <- data
+
+# Creates a table that sums up the steps taken each day
+totalNewStepsEachDay <- aggregate (steps ~ date, newData, sum, na.rm=TRUE)
+
+# Creates histogram
+# 30 Breaks is a decent number without being too spread out or overly bunched up
+hist(totalNewStepsEachDay$steps, col="purple", breaks=30, labels=TRUE,
+     xlab="Total Number of Steps Within Binned Range", ylab="Frequency of Number of Steps Within Binned Range", ylim=c(0, 20), 
+     main="Distribution of New and Improved Total Number of Steps Taken Each Day")
+```
+
+![](PA1_template_files/figure-html/data-imputation-1.png)<!-- -->
+
+```r
+newMeanTotalStepsPerDay <- mean(totalNewStepsEachDay$steps, na.rm=TRUE) #10766.19
+newMeanTotalStepsPerDay
+```
+
+```
+## [1] 10766.19
+```
+
+```r
+newMedianTotalStepsPerDay <- median(totalNewStepsEachDay$steps, na.rm=TRUE) #10766.19
+newMedianTotalStepsPerDay
+```
+
+```
+## [1] 10766.19
+```
+1. 2034
+2. The missing values were replaced with the average of the remaining data. 
+3. See above code.
+4. See above histogram.
+   Mean = 10766.19
+   Median = 10766.19
+5. It is the same mean, but not the same median. The reason being that adding more values equal to the mean to a dataset will not change the mean. 
+   The median is different as the new median will move closer to the mean if more mean value entries were added. So much so that in this instance, the median is    equal to the mean.
+6. The simplistic model we used for data imputation means the histogram increases the frequency of the mean interval from 10 to 18. 
+
+## Are there differences in activity patterns between weekdays and weekends?
+
+1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+2. Make a panel plot containing a time series plot (i.e. \color{red}{\verb|type = "l"|}type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
+
+```r
+# Creates new category daytype. If the date is listed as Saturday or Sunday, it's listed as a Weekend. Else, it's a weekday. 
+newData <- mutate(newData, daytype = ifelse(weekdays(as.Date(newData$date))=="Saturday" | weekdays(as.Date(newData$date))=="Sunday", "Weekend", "Weekday"))
+head(newData)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["steps"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["date"],"name":[2],"type":["chr"],"align":["left"]},{"label":["interval"],"name":[3],"type":["int"],"align":["right"]},{"label":["daytype"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"37.3826","2":"2012-10-01","3":"0","4":"Weekday","_rn_":"1"},{"1":"37.3826","2":"2012-10-01","3":"5","4":"Weekday","_rn_":"2"},{"1":"37.3826","2":"2012-10-01","3":"10","4":"Weekday","_rn_":"3"},{"1":"37.3826","2":"2012-10-01","3":"15","4":"Weekday","_rn_":"4"},{"1":"37.3826","2":"2012-10-01","3":"20","4":"Weekday","_rn_":"5"},{"1":"37.3826","2":"2012-10-01","3":"25","4":"Weekday","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+```r
+# Creates table of steps per interval averaged over type of day
+stepsPerInterval <- aggregate (steps ~ interval + daytype, newData, mean, na.rm=TRUE)
+
+# Creates Panel Plot comparing stepsPerInterval for each daytype
+ggplot(stepsPerInterval, aes(x =interval , y=steps, color=daytype)) +
+  geom_line() + facet_wrap(~ daytype, ncol = 1, nrow=2)
+```
+
+![](PA1_template_files/figure-html/differences-between-weekday-and-weekend-1.png)<!-- -->
+
+```r
+# Pulls the time interval that had the highest amounts of steps on average per a weekday
+weekdays <- filter(stepsPerInterval, daytype=="Weekday")
+maxstepWeekDays <- weekdays[weekdays$steps==max(weekdays$steps),]
+maxstepWeekDays
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["interval"],"name":[1],"type":["int"],"align":["right"]},{"label":["daytype"],"name":[2],"type":["chr"],"align":["left"]},{"label":["steps"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"835","2":"Weekday","3":"207.8732","_rn_":"104"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+```r
+# Pulls the time interval that had the highest amounts of steps on average per a weekend
+weekends <- filter(stepsPerInterval, daytype=="Weekend")
+maxstepWeekends <- weekends[weekends$steps==max(weekends$steps),]
+maxstepWeekends
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["interval"],"name":[1],"type":["int"],"align":["right"]},{"label":["daytype"],"name":[2],"type":["chr"],"align":["left"]},{"label":["steps"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"915","2":"Weekend","3":"157.7978","_rn_":"112"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+1. See above code.
+2. See above plot. 
